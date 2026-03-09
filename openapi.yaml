@@ -1,0 +1,243 @@
+openapi: 3.0.3
+info:
+  title: LOTR API - Personajes
+  description: API REST para gestionar los personajes de El Señor de los Anillos.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api
+    description: Servidor de desarrollo local
+
+tags:
+  - name: Characters
+    description: Operaciones CRUD sobre personajes
+
+paths:
+  /characters:
+    get:
+      summary: Obtener todos los personajes
+      tags: [Characters]
+      responses:
+        "200":
+          description: Lista de personajes obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Character"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+    post:
+      summary: Crear un nuevo personaje
+      tags: [Characters]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CharacterInput"
+            example:
+              name: Aragorn
+              race: Humano
+              age: 87
+              powerLevel: 90
+              isAlive: true
+      responses:
+        "201":
+          description: Personaje creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Character"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /characters/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID único del personaje (ObjectId de MongoDB)
+        schema:
+          type: string
+          example: 64a1f2e3b4c5d6e7f8a9b0c1
+
+    get:
+      summary: Obtener un personaje por ID
+      tags: [Characters]
+      responses:
+        "200":
+          description: Personaje encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Character"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+    put:
+      summary: Actualizar un personaje por ID
+      tags: [Characters]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CharacterInput"
+            example:
+              name: Aragorn
+              race: Humano
+              age: 88
+              powerLevel: 95
+              isAlive: true
+      responses:
+        "200":
+          description: Personaje actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Character"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+    delete:
+      summary: Eliminar un personaje por ID
+      tags: [Characters]
+      responses:
+        "200":
+          description: Personaje eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Personaje eliminado correctamente
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+components:
+  schemas:
+    Character:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID único generado por MongoDB
+          example: 64a1f2e3b4c5d6e7f8a9b0c1
+        name:
+          type: string
+          minLength: 2
+          maxLength: 50
+          description: Nombre del personaje
+          example: Gandalf
+        race:
+          type: string
+          enum: [Elfo, Humano, Enano, Hobbit, Maia, Orco, Ent]
+          description: Raza del personaje
+          example: Maia
+        age:
+          type: integer
+          minimum: 1
+          maximum: 10000
+          description: Edad del personaje en años
+          example: 2019
+        powerLevel:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+          description: Nivel de poder del personaje (1-100)
+          example: 99
+        isAlive:
+          type: boolean
+          default: true
+          description: Indica si el personaje está vivo
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha de creación del registro
+        updatedAt:
+          type: string
+          format: date-time
+          description: Fecha de última actualización
+
+    CharacterInput:
+      type: object
+      required:
+        - name
+        - race
+        - age
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 50
+          example: Frodo
+        race:
+          type: string
+          enum: [Elfo, Humano, Enano, Hobbit, Maia, Orco, Ent]
+          example: Hobbit
+        age:
+          type: integer
+          minimum: 1
+          maximum: 10000
+          example: 50
+        powerLevel:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+          example: 40
+        isAlive:
+          type: boolean
+          default: true
+          example: true
+
+  responses:
+    NotFound:
+      description: Personaje no encontrado
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Personaje no encontrado
+
+    ValidationError:
+      description: Error de validación en los datos enviados
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "El nombre del personaje es obligatorio"
+
+    InternalError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Error interno del servidor
