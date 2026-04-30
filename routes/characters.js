@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Character = require('../models/Character');
+const { authenticate, requireRole } = require('../middleware/auth');
 
-// CREATE - Crear personaje
-router.post('/', async (req, res) => {
+// CREATE - Crear personaje (requiere sesión iniciada con cualquier rol)
+router.post('/', authenticate, async (req, res) => {
   try {
     const character = new Character(req.body);
     await character.save();
@@ -54,8 +55,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE - Eliminar personaje
-router.delete('/:id', async (req, res) => {
+// DELETE - Eliminar personaje (requiere rol 'admin')
+router.delete('/:id', requireRole('admin'), async (req, res) => {
   try {
     const character = await Character.findByIdAndDelete(req.params.id);
     if (!character) {

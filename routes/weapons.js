@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Weapon = require('../models/Weapon');
+const { authenticate, requireRole } = require('../middleware/auth');
 
-// CREATE
-router.post('/', async (req, res) => {
+// CREATE (requiere sesión iniciada con cualquier rol)
+router.post('/', authenticate, async (req, res) => {
   try {
     const weapon = new Weapon(req.body);
     await weapon.save();
@@ -54,8 +55,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE
-router.delete('/:id', async (req, res) => {
+// DELETE (requiere rol 'admin')
+router.delete('/:id', requireRole('admin'), async (req, res) => {
   try {
     const weapon = await Weapon.findByIdAndDelete(req.params.id);
     if (!weapon) {
