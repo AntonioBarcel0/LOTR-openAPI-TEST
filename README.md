@@ -1,5 +1,7 @@
 # LOTR API - El Señor de los Anillos
 
+![CI/CD](https://github.com/AntonioBarcel0/LOTR-openAPI-TEST/actions/workflows/ci-cd.yml/badge.svg)
+
 API REST para gestionar personajes, armas y regiones de la Tierra Media, construida con **Node.js**, **Express** y **MongoDB**.
 
 ---
