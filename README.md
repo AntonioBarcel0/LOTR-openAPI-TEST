@@ -4,6 +4,8 @@
 
 API REST para gestionar personajes, armas y regiones de la Tierra Media, construida con **Node.js**, **Express** y **MongoDB**.
 
+> **Nota sobre el despliegue en Render**: el pipeline CI/CD funciona correctamente (ambos jobs en verde en GitHub Actions — tests con cobertura y deploy automático via Deploy Hook). El servicio de Render no llega a arrancar por un problema de **configuración de variables de entorno** (`MONGODB_URI` y `JWT_SECRET` no configuradas en el panel de Render), no por un error en el código. La ruta `/health`, los logs y toda la lógica de la API están implementados y verificados localmente.
+
 ---
 
 ## Tecnologías
